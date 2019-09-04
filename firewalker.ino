@@ -2,7 +2,7 @@
 
 #include <Adafruit_NeoPixel.h>
 
-const uint8_t gamma[] PROGMEM = { // Gamma correction table for LED brightness
+const uint8_t gamma1[] PROGMEM = { // Gamma correction table for LED brightness
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
     1,  1,  1,  1,  1,  1,  1,  1,  1,  2,  2,  2,  2,  2,  2,  2,
@@ -28,9 +28,9 @@ const uint8_t gamma[] PROGMEM = { // Gamma correction table for LED brightness
 // Phil's shoes: 43 LEDs total, 22 LEDs long, LED #6 at back.
 #define N_LEDS        39 // TOTAL number of LEDs in strip
 #define SHOE_LEN_LEDS 20 // Number of LEDs down ONE SIDE of shoe
-#define SHOE_LED_BACK  5 // Index of REAR-MOST LED on shoe
-#define STEP_PIN      A9 // Analog input for footstep
-#define LED_PIN        6 // NeoPixel strip is connected here
+#define SHOE_LED_BACK  19 // Index of REAR-MOST LED on shoe
+#define STEP_PIN      A1 // Analog input for footstep
+#define LED_PIN        1 // NeoPixel strip is connected here
 #define MAXSTEPS       3 // Process (up to) this many concurrent steps
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(N_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
