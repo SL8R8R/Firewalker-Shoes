@@ -26,10 +26,10 @@ const uint8_t gamma1[] PROGMEM = { // Gamma correction table for LED brightness
 // the strip and shoe sizes, and the positions of the front- and rear-most LEDs.
 // Becky's shoes: 39 LEDs total, 20 LEDs long, LED #5 at back.
 // Phil's shoes: 43 LEDs total, 22 LEDs long, LED #6 at back.
-#define N_LEDS        39 // TOTAL number of LEDs in strip
-#define SHOE_LEN_LEDS 20 // Number of LEDs down ONE SIDE of shoe
-#define SHOE_LED_BACK  19 // Index of REAR-MOST LED on shoe
-#define STEP_PIN      A1 // Analog input for footstep
+#define N_LEDS        46 // TOTAL number of LEDs in strip
+#define SHOE_LEN_LEDS 23 // Number of LEDs down ONE SIDE of shoe
+#define SHOE_LED_BACK  1 // Index of REAR-MOST LED on shoe
+#define STEP_PIN      A2 // Analog input for footstep
 #define LED_PIN        1 // NeoPixel strip is connected here
 #define MAXSTEPS       3 // Process (up to) this many concurrent steps
 
@@ -77,6 +77,7 @@ void setup() {
 
 void loop() {
   uint8_t i, j;
+  
 
   // Read analog input, with a little noise filtering
   stepFiltered = ((stepFiltered * 3) + analogRead(STEP_PIN)) >> 2;
@@ -143,15 +144,15 @@ void loop() {
   for(i=0; i<SHOE_LEN_LEDS; i++) { // For each LED on one side...
     level = mag[i];                // Pixel magnitude (brightness)
     if(level < 255) {              // 0-254 = black to red-1
-      r = pgm_read_byte(&gamma[level]);
+      r = pgm_read_byte(&gamma1[level]);
       g = b = 0;
     } else if(level < 510) {       // 255-509 = red to yellow-1
       r = 255;
-      g = pgm_read_byte(&gamma[level - 255]);
+      g = pgm_read_byte(&gamma1[level - 255]);
       b = 0;
     } else if(level < 765) {       // 510-764 = yellow to white-1
       r = g = 255;
-      b = pgm_read_byte(&gamma[level - 510]);
+      b = pgm_read_byte(&gamma1[level - 510]);
     } else {                       // 765+ = white
       r = g = b = 255;
     }
