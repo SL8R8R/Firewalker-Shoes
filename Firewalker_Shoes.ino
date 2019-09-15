@@ -29,7 +29,8 @@ const uint8_t gamma1[] PROGMEM = { // Gamma correction table for LED brightness
 #define N_LEDS        46 // TOTAL number of LEDs in strip
 #define SHOE_LEN_LEDS 23 // Number of LEDs down ONE SIDE of shoe
 #define SHOE_LED_BACK  1 // Index of REAR-MOST LED on shoe
-#define PRESSURE_PIN      A1 // Analog input for footstep
+#define PRESSURE_PIN  A1 // Analog input for footstep
+#define VIBE_PIN      A2 //Input for vibration sensor
 #define LED_PIN        1 // NeoPixel strip is connected here
 #define MAXSTEPS       3 // Process (up to) this many concurrent steps
 
@@ -53,9 +54,10 @@ uint8_t
   dup[SHOE_LEN_LEDS]; // Inside/outside copy indexes
 boolean
   stepping  = false;  // If set, step was triggered, waiting to release
-  debug = false;      // we'll set to  true  below in order to get analog readout :+1:
+  //debug = false;      // we'll set to  true  below in order to get analog readout :+1:
 
 void setup() {
+  Serial.begin(9600);
   pinMode(9, INPUT_PULLUP); // Set internal pullup resistor for sensor pin
   // As previously mentioned, the step animation is mirrored on the inside and
   // outside faces of the shoe.  To avoid a bunch of math and offsets later, the
@@ -72,16 +74,31 @@ void setup() {
   memset(stepMag, 0, sizeof(stepMag));
   memset(stepX  , 0, sizeof(stepX));
   strip.begin();
+  strip.show();
   stepFiltered = analogRead(PRESSURE_PIN); // Initial input
 }
 
 
 //set debug here; true if you want sensor readout
-debug = true;
+//debug = true;
 
 
+void loop() {
+  Serial.print("sensor = ");
+  Serial.println(VIBE_PIN);
+  strip.show();
 
-void loop(debug_bool) {
+  if (VIBE_PIN != 10) {
+    strip.begin();  // INITIALIZE NeoPixel strip object (REQUIRED)
+    strip.clear();  // Turn OFF all pixels ASAP
+    
+    for (int i = 0; i <= 11; i = i + 1){
+      strip.setPixelColor(i, 100, 100, 100);
+    }
+  }
+}
+
+void loop2() {
   uint8_t i, j;
   
 
@@ -172,4 +189,3 @@ void loop(debug_bool) {
   strip.show();
   delayMicroseconds(1500);
 }
-
