@@ -29,8 +29,8 @@ const uint8_t gamma1[] PROGMEM = { // Gamma correction table for LED brightness
 #define N_LEDS        43 // TOTAL number of LEDs in strip
 #define SHOE_LEN_LEDS 23 // Number of LEDs down ONE SIDE of shoe
 #define SHOE_LED_BACK  1 // Index of REAR-MOST LED on shoe
-#define PRESSURE_PIN   2 // Analog input for footstep
-#define VIBE_PIN       0 //Input for vibration sensor
+#define PRESSURE_PIN   A1 // Analog input for footstep
+#define VIBE_PIN       A2 //Input for vibration sensor
 #define LED_PIN        1 // NeoPixel strip is connected here
 #define MAXSTEPS       3 // Process (up to) this many concurrent steps
 
@@ -57,9 +57,9 @@ boolean
   //debug = false;      // we'll set to  true  below in order to get analog readout :+1:
 
 void setup() {
-  Serial.begin(9600);
-  pinMode(VIBE_PIN,INPUT);
-  pinMode(2, INPUT_PULLUP); // Set internal pullup resistor for sensor pin
+  Serial.begin(300);
+  pinMode(VIBE_PIN,INPUT_PULLUP);
+  pinMode(A2, INPUT_PULLUP); // Set internal pullup resistor for sensor pin
   // As previously mentioned, the step animation is mirrored on the inside and
   // outside faces of the shoe.  To avoid a bunch of math and offsets later, the
   // 'dup' array indicates where each pixel on the outside face of the shoe should
@@ -77,6 +77,10 @@ void setup() {
   strip.begin();
   strip.show();
   stepFiltered = analogRead(PRESSURE_PIN); // Initial input
+
+  Serial.print("pressure_sensor = ");
+  stepFiltered = analogRead(PRESSURE_PIN); // Initial input
+  Serial.println(stepFiltered);
 }
 
 
@@ -84,28 +88,55 @@ void setup() {
 //debug = true;
 
 
-void loop2() {
+//void loop2() {
+//  int vibe;
+//  Serial.print("sensor = ");
+//  vibe = digitalRead(VIBE_PIN);
+//  Serial.println(vibe);
+//
+//  if (vibe != 0) {
+//    strip.begin();  // INITIALIZE NeoPixel strip object (REQUIRED)
+//    strip.clear();  // Turn OFF all pixels ASAP
+//    
+//    for (int i = 0; i <= 11; i = i + 1){
+//      strip.setPixelColor(i, 0, 0, 255);
+//    }
+//    strip.show();
+//  }
+//  else {
+//    strip.clear();
+//    strip.show();
+//  
+//  }
+//}
+
+void loop() {
+  uint8_t i, j;
+  int vibe;
+
+  Serial.print("pressure_sensor = ");
+  stepFiltered = analogRead(PRESSURE_PIN); // Initial input
+  Serial.println(stepFiltered);
+
+ 
   Serial.print("sensor = ");
-  digitalRead(VIBE_PIN);
-  Serial.println(VIBE_PIN);
+  vibe = digitalRead(VIBE_PIN);
+  Serial.println(vibe);
   strip.show();
 
-  if (VIBE_PIN != 0) {
+  if (vibe != 1) {
     strip.begin();  // INITIALIZE NeoPixel strip object (REQUIRED)
     strip.clear();  // Turn OFF all pixels ASAP
     
     for (int i = 0; i <= 11; i = i + 1){
-      strip.setPixelColor(i, 100, 100, 100);
+      strip.setPixelColor(i, 55, 0, 0);
     }
+    strip.show();
+    delay(1000);
+    strip.clear();
+    strip.show();
   }
-}
 
-void loop() {
-  uint8_t i, j;
-
-  Serial.print("sensor = ");
-  analogRead(PRESSURE_PIN);
-  Serial.println(PRESSURE_PIN);
   
 
   // Read analog input, with a little noise filtering
