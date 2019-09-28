@@ -26,9 +26,9 @@ const uint8_t gamma1[] PROGMEM = { // Gamma correction table for LED brightness
 // the strip and shoe sizes, and the positions of the front- and rear-most LEDs.
 // Becky's shoes: 39 LEDs total, 20 LEDs long, LED #5 at back.
 // Phil's shoes: 43 LEDs total, 22 LEDs long, LED #6 at back.
-#define N_LEDS        43 // TOTAL number of LEDs in strip
-#define SHOE_LEN_LEDS 23 // Number of LEDs down ONE SIDE of shoe
-#define SHOE_LED_BACK  1 // Index of REAR-MOST LED on shoe
+#define N_LEDS         43 // TOTAL number of LEDs in strip
+#define SHOE_LEN_LEDS  22 // Number of LEDs down ONE SIDE of shoe
+#define SHOE_LED_FRONT  14 // Index of FRONT-MOST LED on shoe
 #define PRESSURE_PIN   A1 // Analog input for footstep
 #define VIBE_PIN       A2 //Input for vibration sensor
 #define LED_PIN        1 // NeoPixel strip is connected here
@@ -40,7 +40,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(N_LEDS, LED_PIN, NEO_GRB + NEO_KHZ80
 // then dip below 100 when the heel is standing on it (for Phil's shoes; Becky's
 // don't dip quite as low because she's smaller).
 #define STEP_TRIGGER    100  // Reading must be above this to trigger step
-#define STEP_HYSTERESIS 90  // After trigger, must return to this level
+#define STEP_HYSTERESIS 62  // After trigger, must return to this level
 
 int
   stepMag[MAXSTEPS],  // Magnitude of steps
@@ -57,7 +57,7 @@ boolean
   //debug = false;      // we'll set to  true  below in order to get analog readout :+1:
 
 void setup() {
-  Serial.begin(300);
+  Serial.begin(9600);
   pinMode(VIBE_PIN,INPUT_PULLUP);
   pinMode(A2, INPUT_PULLUP); // Set internal pullup resistor for sensor pin
   // As previously mentioned, the step animation is mirrored on the inside and
@@ -68,8 +68,8 @@ void setup() {
   // copied to the appropriate positions on the inside face.
   memset(dup, 255, sizeof(dup));
   int8_t a, b;
-  for(a=1              , b=SHOE_LED_BACK-1            ; b>=0    ;) dup[a++] = b--;
-  for(a=SHOE_LEN_LEDS-2, b=SHOE_LED_BACK+SHOE_LEN_LEDS; b<N_LEDS;) dup[a--] = b++;
+  for(a=1              , b=SHOE_LED_FRONT-1            ; b>=0    ;) dup[a++] = b--;
+  for(a=SHOE_LEN_LEDS-2, b=SHOE_LED_FRONT+SHOE_LEN_LEDS; b<N_LEDS;) dup[a--] = b++;
 
   // Clear step magnitude and position buffers
   memset(stepMag, 0, sizeof(stepMag));
@@ -84,30 +84,16 @@ void setup() {
 }
 
 
-//set debug here; true if you want sensor readout
-//debug = true;
-
-
-//void loop2() {
-//  int vibe;
+//void loop() {     // Uncomment this entire loop and rename the loop below to loop2 so that this loop runs and not the one below.
+//  int vibe;       // This loop is used for serial monitor feedback about the sensors.
 //  Serial.print("sensor = ");
 //  vibe = digitalRead(VIBE_PIN);
 //  Serial.println(vibe);
-//
-//  if (vibe != 0) {
-//    strip.begin();  // INITIALIZE NeoPixel strip object (REQUIRED)
-//    strip.clear();  // Turn OFF all pixels ASAP
-//    
-//    for (int i = 0; i <= 11; i = i + 1){
-//      strip.setPixelColor(i, 0, 0, 255);
-//    }
-//    strip.show();
-//  }
-//  else {
-//    strip.clear();
-//    strip.show();
-//  
-//  }
+// 
+//  uint8_t i, j;
+//  Serial.print("pressure_sensor = ");
+//  stepFiltered = analogRead(PRESSURE_PIN); // Initial input
+//  Serial.println(stepFiltered);
 //}
 
 void loop() {
@@ -128,13 +114,16 @@ void loop() {
     strip.begin();  // INITIALIZE NeoPixel strip object (REQUIRED)
     strip.clear();  // Turn OFF all pixels ASAP
     
-    for (int i = 0; i <= 11; i = i + 1){
-      strip.setPixelColor(i, 55, 0, 0);
+    for (int i = 0; i <= 43; i = i + 1){
+      strip.setPixelColor(i, 50, 0, 50);
     }
     strip.show();
     delay(1000);
-    strip.clear();
-    strip.show();
+//    strip.clear();
+//    strip.show();
+  } else {
+      strip.clear();
+      strip.show();
   }
 
   
@@ -217,12 +206,12 @@ void loop() {
       r = g = b = 255;
     }
     // Set R/G/B color along outside of shoe
-    strip.setPixelColor(i+SHOE_LED_BACK, r, g, b);
+    strip.setPixelColor(i+SHOE_LED_FRONT, r, g, b);
     // Pixels along inside are funny...
     j = dup[i];
     if(j < 255) strip.setPixelColor(j, r, g, b);
   }
 
   strip.show();
-  delayMicroseconds(1500);
+  delayMicroseconds(100);
 }
